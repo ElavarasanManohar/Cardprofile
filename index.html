@@ -1,0 +1,579 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>Cardprofile — Credit Card Dashboard</title>
+<style>
+:root{--bg:#f4f6fa;--surface:#fff;--text:#172033;--muted:#788397;--line:#e7ebf2;--primary:#635bdb;--green:#16a878;--red:#e45b68;--orange:#ed9b40;--shadow:0 8px 28px #1c27440d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.5}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #aaa4ff;outline-offset:2px}
+.app{max-width:1240px;margin:auto;padding:22px}
+.topbar,.brand,.actions,.heading,.hero-top,.hero-stats,.metric-head,.money-row,.bar-label,.card-top,.card-bottom,.modal-head,.modal-actions{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.topbar{margin-bottom:26px}
+.brand{justify-content:flex-start;gap:11px}
+.logo{width:43px;height:43px;border-radius:14px;background:var(--primary);display:grid;place-items:center;color:#fff;font-size:23px;font-weight:850}
+.brand h1{font-size:21px;margin:0;letter-spacing:-.7px}
+.brand p{margin:1px 0 0;color:var(--muted);font-size:12px}
+.actions{flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:white;color:var(--text);padding:10px 14px;border-radius:11px;font-weight:650;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn.primary{background:var(--primary);color:white;border-color:var(--primary)}
+.btn.small{padding:7px 10px;font-size:12px}
+.btn.danger{color:var(--red)}
+.hero{background:linear-gradient(120deg,#22224b,#4642a1 70%,#7268e8);color:white;border-radius:24px;padding:27px 29px;margin-bottom:22px;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:240px;height:240px;border:45px solid #ffffff0d;border-radius:50%;right:-65px;top:-105px;pointer-events:none}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;opacity:.75;font-weight:750}
+.hero h2{font-size:clamp(28px,4vw,39px);letter-spacing:-1.2px;margin:8px 0 4px}
+.sub{margin:0;color:#d9d8ff;font-size:13px}
+.hero-stats{justify-content:flex-start;margin-top:26px;position:relative;z-index:1}
+.hero-stat{border-left:1px solid #ffffff35;padding-left:19px;min-width:0;flex:1}
+.hero-stat:first-child{border:0;padding-left:0}
+.hero-stat .label{font-size:12px;color:#d4d3ff}
+.hero-stat .value{font-size:19px;font-weight:750;margin-top:5px;overflow-wrap:anywhere}
+.hero-stat .note{font-size:11px;color:#d4d3ff;margin-top:2px}
+.heading{margin:27px 0 14px}
+.heading h2{font-size:18px;margin:0;letter-spacing:-.4px}
+.heading p{margin:3px 0 0;color:var(--muted);font-size:12px}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.metric,.panel,.credit-card{background:white;border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow);min-width:0}
+.metric{padding:17px}
+.metric-label{font-size:12px;color:var(--muted);font-weight:650}
+.metric-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:#f0efff;font-size:17px}
+.metric-value{font-size:24px;font-weight:780;letter-spacing:-.7px;margin:12px 0 4px;overflow-wrap:anywhere}
+.metric-note{font-size:11px;color:var(--muted)}
+.progress,.bar-track{height:7px;background:#edf0f5;border-radius:20px;overflow:hidden}
+.progress{margin-top:13px}
+.progress span,.bar-fill{display:block;height:100%;border-radius:20px;transition:width .25s}
+.progress span{background:var(--primary)}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.panel{padding:21px}
+.panel h3{font-size:15px;margin:0}
+.panel .desc{font-size:12px;color:var(--muted);margin:4px 0 18px}
+.donut-wrap{display:flex;align-items:center;justify-content:center;gap:25px;min-height:185px}
+.donut{width:145px;height:145px;border-radius:50%;position:relative;flex-shrink:0;background:conic-gradient(#e9ecf2 0% 100%)}
+.donut:after{content:"";position:absolute;inset:22px;border-radius:50%;background:white}
+.donut-center{position:absolute;z-index:1;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-center strong{font-size:20px;letter-spacing:-.5px}
+.donut-center span{font-size:10px;color:var(--muted)}
+.legend,.bar-list{display:grid;gap:13px}
+.legend-item{display:flex;align-items:start;gap:8px;font-size:12px}
+.dot{width:9px;height:9px;border-radius:3px;flex-shrink:0;margin-top:5px}
+.legend-item strong{display:block;font-size:13px;overflow-wrap:anywhere}
+.legend-item small{color:var(--muted)}
+.bar-label{font-size:12px;margin-bottom:7px}
+.bar-label span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-label strong{white-space:nowrap}
+.bar-fill{background:var(--primary)}
+.cards-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.credit-card{padding:12px}
+.card-visual{min-height:166px;border-radius:13px;padding:16px;color:white;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(135deg,#34326c,#655bdd)}
+.card-visual:before,.card-visual:after{content:"";position:absolute;border:1px solid #ffffff25;border-radius:50%;pointer-events:none}
+.card-visual:before{width:210px;height:210px;right:-85px;top:-95px}
+.card-visual:after{width:150px;height:150px;right:-36px;top:-45px}
+.teal{background:linear-gradient(135deg,#075b60,#20a99c)!important}
+.navy{background:linear-gradient(135deg,#17263d,#385d83)!important}
+.rose{background:linear-gradient(135deg,#772f53,#db738b)!important}
+.orange{background:linear-gradient(135deg,#90481d,#e7a34b)!important}
+.green{background:linear-gradient(135deg,#24543e,#59a77a)!important}
+.blue{background:linear-gradient(135deg,#1e4588,#658ef2)!important}
+.purple{background:linear-gradient(135deg,#4a287a,#a178dd)!important}
+.card-top,.card-bottom{position:relative;z-index:1}
+.card-bank{font-size:11px;opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:75%}
+.card-network{font-weight:850;font-size:15px;font-style:italic}
+.chip{width:29px;height:22px;border:1px solid #ffffff88;border-radius:6px;background:#ffffff20;margin-top:9px}
+.card-name{font-size:19px;font-weight:760;letter-spacing:-.4px;overflow-wrap:anywhere}
+.card-tag{font-size:10px;opacity:.8;margin-top:2px}
+.card-body{padding:15px 3px 3px}
+.money-row{align-items:start}
+.money-row small{display:block;color:var(--muted);font-size:11px}
+.money-row strong{display:block;font-size:18px;margin-top:3px;letter-spacing:-.3px;overflow-wrap:anywhere}
+.util-label{display:flex;justify-content:space-between;gap:8px;margin:15px 0 6px;font-size:11px}
+.util-label span{color:var(--muted)}
+.card-actions{display:flex;gap:7px;margin-top:14px}
+.card-actions .btn{flex:1;padding:8px 5px;font-size:12px}
+.due-note{font-size:11px;color:var(--muted);margin-top:10px;min-height:17px}
+.empty{padding:35px 18px;text-align:center;border:1px dashed #ccd3e1;border-radius:18px;color:var(--muted);background:#ffffff80}
+.empty .emoji{font-size:30px;margin-bottom:8px}
+.empty h3{color:var(--text);margin:0 0 6px}
+.empty p{font-size:12px;margin:0 0 15px}
+.footer{color:var(--muted);font-size:11px;text-align:center;padding:30px 0 15px}
+.overlay{position:fixed;inset:0;background:#11182785;z-index:10;display:none;align-items:center;justify-content:center;padding:15px;overflow:auto}
+.overlay.open{display:flex}
+.modal{background:white;border-radius:22px;padding:23px;width:min(100%,510px);max-height:94dvh;overflow:auto;box-shadow:0 25px 80px #0002}
+.modal-head{margin-bottom:18px}
+.modal-head h2{margin:0;font-size:20px}
+.close{border:0;background:#f0f2f7;border-radius:10px;width:35px;height:35px;font-size:20px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field.full{grid-column:1/-1}
+.field label{font-size:12px;font-weight:700}
+.field input,.field select{width:100%;border:1px solid #dfe4ed;border-radius:11px;padding:11px 12px;background:white;color:var(--text);min-width:0}
+.help{font-size:11px;color:var(--muted);margin:0}
+.form-error{font-size:12px;color:var(--red);margin:12px 0 0;display:none}
+.modal-actions{justify-content:flex-end;margin-top:22px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#1d2940;color:white;padding:12px 18px;border-radius:12px;box-shadow:0 8px 30px #0002;z-index:20;display:none;max-width:90%;text-align:center;font-size:13px}
+.toast.show{display:block}
+.backup-input{display:none}
+@media(max-width:850px){.cards-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){
+ .app{padding:14px}
+ .topbar{align-items:flex-start;margin-bottom:19px}
+ .brand h1{font-size:19px}
+ .actions{gap:6px}
+ .actions .btn{padding:9px 10px;font-size:12px}
+ .actions .secondary{display:none}
+ .hero{padding:22px 19px;border-radius:21px}
+ .hero-stats{gap:9px;margin-top:21px}
+ .hero-stat{padding-left:9px}
+ .hero-stat .value{font-size:14px}
+ .hero-stat .label{font-size:10px}
+ .metrics{grid-template-columns:1fr 1fr;gap:10px}
+ .metric{padding:13px}
+ .metric:first-child{grid-column:1/-1}
+ .metric-value{font-size:21px}
+ .charts{grid-template-columns:1fr}
+ .panel{padding:17px}
+ .donut-wrap{gap:18px}
+ .donut{width:132px;height:132px}
+ .donut:after{inset:20px}
+ .cards-grid{grid-template-columns:1fr}
+ .card-visual{min-height:175px}
+ .card-name{font-size:21px}
+ .heading{margin-top:24px}
+ .heading h2{font-size:17px}
+ .form-grid{grid-template-columns:1fr}
+ .field.full{grid-column:auto}
+ .modal{padding:19px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">CC</div>
+      <div><h1>Cardprofile</h1><p>Your credit card overview</p></div>
+    </div>
+    <div class="actions">
+      <button class="btn secondary" id="exportBtn">↗ Backup</button>
+      <button class="btn secondary" id="importBtn">↙ Restore</button>
+      <button class="btn primary" id="addBtn">＋ Add card</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="eyebrow">Your credit overview</div>
+        <h2 id="heroOutstanding">₹0</h2>
+        <p class="sub">Total outstanding across your cards</p>
+      </div>
+      <div style="font-size:30px;opacity:.8">◈</div>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="label">Total credit limit</div><div class="value" id="heroLimit">₹0</div><div class="note">Across all cards</div></div>
+      <div class="hero-stat"><div class="label">Available credit</div><div class="value" id="heroAvailable">₹0</div><div class="note">Limit minus outstanding</div></div>
+      <div class="hero-stat"><div class="label">Credit utilisation</div><div class="value" id="heroUtil">0%</div><div class="note">Overall utilisation</div></div>
+    </div>
+  </section>
+
+  <div class="heading"><div><h2>At a glance</h2><p>Your current credit position</p></div></div>
+  <section class="metrics">
+    <div class="metric">
+      <div class="metric-head"><span class="metric-label">Outstanding</span><span class="metric-icon">↗</span></div>
+      <div class="metric-value" id="metricOutstanding">₹0</div><div class="metric-note">Amount currently owed</div>
+      <div class="progress"><span id="outstandingProgress" style="width:0%"></span></div>
+    </div>
+    <div class="metric">
+      <div class="metric-head"><span class="metric-label">Available credit</span><span class="metric-icon">✓</span></div>
+      <div class="metric-value" id="metricAvailable">₹0</div><div class="metric-note">Remaining across all cards</div>
+    </div>
+    <div class="metric">
+      <div class="metric-head"><span class="metric-label">Cards tracked</span><span class="metric-icon">▤</span></div>
+      <div class="metric-value" id="metricCards">0</div><div class="metric-note">Cards in your portfolio</div>
+    </div>
+  </section>
+
+  <div class="heading"><div><h2>Spending insights</h2><p>Understand how your credit is being used</p></div></div>
+  <section class="charts">
+    <div class="panel">
+      <h3>Credit utilisation</h3><p class="desc">Outstanding versus available credit</p>
+      <div class="donut-wrap">
+        <div class="donut" id="donut"><div class="donut-center"><strong id="donutPct">0%</strong><span>utilised</span></div></div>
+        <div class="legend">
+          <div class="legend-item"><span class="dot" style="background:#635bdb"></span><div>Outstanding<strong id="legendOutstanding">₹0</strong></div></div>
+          <div class="legend-item"><span class="dot" style="background:#e9ecf2"></span><div>Available<strong id="legendAvailable">₹0</strong></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Utilisation by card</h3><p class="desc">Percentage of each card's limit being used</p>
+      <div class="bar-list" id="utilisationBars"></div>
+    </div>
+  </section>
+
+  <div class="heading">
+    <div><h2>My cards</h2><p>Manage balances and credit limits</p></div>
+    <button class="btn primary small" id="addBtn2">＋ Add card</button>
+  </div>
+  <section class="cards-grid" id="cardsGrid"></section>
+
+  <div class="footer">Cardfolio · Data saved locally in this browser</div>
+</div>
+
+<div class="overlay" id="cardOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <div class="modal-head"><h2 id="modalTitle">Add credit card</h2><button class="close" id="closeModal" aria-label="Close">×</button></div>
+    <form id="cardForm">
+      <div class="form-grid">
+        <div class="field full"><label for="cardName">Card name *</label><input id="cardName" maxlength="60" required placeholder="e.g. HDFC Regalia Gold"></div>
+        <div class="field"><label for="bankName">Bank / issuer</label><input id="bankName" maxlength="60" placeholder="e.g. HDFC Bank"></div>
+        <div class="field"><label for="network">Network</label><select id="network"><option>Visa</option><option>Mastercard</option><option>RuPay</option><option>American Express</option><option>Other</option></select></div>
+        <div class="field"><label for="creditLimit">Credit limit (₹) *</label><input id="creditLimit" type="number" min="1" max="100000000000" step="0.01" required placeholder="150000"></div>
+        <div class="field"><label for="outstanding">Outstanding (₹) *</label><input id="outstanding" type="number" min="0" max="100000000000" step="0.01" required value="0"></div>
+        <div class="field full"><label for="dueDate">Payment due date (optional)</label><input id="dueDate" type="date"><p class="help">For your reference only. Cardfolio will not send payment reminders.</p></div>
+        <div class="field full"><label for="cardColor">Card design</label><select id="cardColor"><option value="">Midnight purple</option><option value="teal">Ocean teal</option><option value="navy">Classic navy</option><option value="rose">Rose</option><option value="orange">Amber</option><option value="green">Forest green</option><option value="blue">Royal blue</option><option value="purple">Lavender</option></select></div>
+      </div>
+      <p class="form-error" id="formError" role="alert"></p>
+      <div class="modal-actions"><button type="button" class="btn" id="cancelModal">Cancel</button><button type="submit" class="btn primary">Save card</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="overlay" id="adjustOverlay" role="dialog" aria-modal="true" aria-labelledby="adjustTitle">
+  <div class="modal">
+    <div class="modal-head"><h2 id="adjustTitle">Update outstanding</h2><button class="close" id="closeAdjust" aria-label="Close">×</button></div>
+    <form id="adjustForm">
+      <p id="adjustCardLabel" class="help" style="margin-bottom:16px"></p>
+      <div class="field"><label for="adjustAmount">New outstanding amount (₹)</label><input id="adjustAmount" type="number" min="0" max="100000000000" step="0.01" required></div>
+      <p class="help" style="margin-top:9px">Enter the full current balance, not the payment amount.</p>
+      <p class="form-error" id="adjustError" role="alert"></p>
+      <div class="modal-actions"><button type="button" class="btn" id="cancelAdjust">Cancel</button><button class="btn primary" type="submit">Update balance</button></div>
+    </form>
+  </div>
+</div>
+
+<input class="backup-input" type="file" id="importFile" accept=".json,application/json">
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+"use strict";
+
+const STORAGE_KEY = "cardfolio.cards.v1";
+const COLORS = ["", "teal", "navy", "rose", "orange", "green", "blue", "purple"];
+const PALETTE = ["#635bdb","#16a878","#ed9b40","#e45b68","#4285e9","#8c60cf","#209eae","#64748b"];
+const $ = id => document.getElementById(id);
+let cards = [];
+let editingId = null;
+let adjustingId = null;
+let toastTimer;
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,9);
+}
+function money(n) {
+  return new Intl.NumberFormat("en-IN", {
+    style:"currency", currency:"INR", maximumFractionDigits:2
+  }).format(Number(n)||0);
+}
+function num(n) { return Number(n).toLocaleString("en-IN"); }
+function pct(n) { return (Number.isFinite(n)?n:0).toFixed(1).replace(/\.0$/,"") + "%"; }
+function safeText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
+}
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+    return true;
+  } catch(e) {
+    notify("Could not save data. Browser storage may be full or disabled.");
+    return false;
+  }
+}
+function load() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    cards = Array.isArray(parsed) ? parsed.filter(validCard).map(normalizeCard) : [];
+  } catch(e) { cards = []; }
+}
+function validCard(c) {
+  return c && typeof c === "object" &&
+    typeof c.name === "string" &&
+    Number.isFinite(Number(c.limit)) && Number(c.limit) > 0 &&
+    Number.isFinite(Number(c.outstanding)) && Number(c.outstanding) >= 0;
+}
+function normalizeCard(c) {
+  return {
+    id: String(c.id || uid()),
+    name: String(c.name).slice(0,60),
+    bank: String(c.bank || "").slice(0,60),
+    network: ["Visa","Mastercard","RuPay","American Express","Other"].includes(c.network) ? c.network : "Visa",
+    limit: Number(c.limit),
+    outstanding: Number(c.outstanding),
+    due: /^\d{4}-\d{2}-\d{2}$/.test(c.due || "") ? c.due : "",
+    color: COLORS.includes(c.color) ? c.color : "",
+    created: Number(c.created) || Date.now()
+  };
+}
+function totals() {
+  const limit = cards.reduce((s,c)=>s+c.limit,0);
+  const outstanding = cards.reduce((s,c)=>s+c.outstanding,0);
+  const available = limit-outstanding;
+  return {limit,outstanding,available,util:limit ? outstanding/limit*100 : 0};
+}
+function notify(message) {
+  const el = $("toast");
+  el.textContent = message;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove("show"),2800);
+}
+function utilisation(c) {
+  return c.limit ? c.outstanding/c.limit*100 : 0;
+}
+function dueText(c) {
+  if(!c.due) return "No due date added";
+  const due = new Date(c.due+"T12:00:00");
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const days = Math.round((due-new Date(today.getFullYear(),today.getMonth(),today.getDate(),12))/86400000);
+  if(days < 0) return "Due date passed · "+due.toLocaleDateString("en-IN",{day:"numeric",month:"short"});
+  if(days === 0) return "Due today";
+  if(days === 1) return "Due tomorrow";
+  return "Due "+due.toLocaleDateString("en-IN",{day:"numeric",month:"short"});
+}
+function render() {
+  const t=totals();
+  $("heroOutstanding").textContent=money(t.outstanding);
+  $("heroLimit").textContent=money(t.limit);
+  $("heroAvailable").textContent=money(t.available);
+  $("heroUtil").textContent=pct(t.util);
+  $("metricOutstanding").textContent=money(t.outstanding);
+  $("metricAvailable").textContent=money(t.available);
+  $("metricCards").textContent=cards.length;
+  $("outstandingProgress").style.width=Math.min(t.util,100)+"%";
+  $("legendOutstanding").textContent=money(t.outstanding);
+  $("legendAvailable").textContent=money(t.available);
+  $("donutPct").textContent=pct(t.util);
+  const portion=t.limit ? Math.min(100,Math.max(0,t.util)) : 0;
+  $("donut").style.background=`conic-gradient(#635bdb 0% ${portion}%,#e9ecf2 ${portion}% 100%)`;
+
+  const bars=$("utilisationBars");
+  if(!cards.length) {
+    bars.innerHTML='<p class="help">Add a card to see utilisation insights.</p>';
+  } else {
+    bars.innerHTML=[...cards].sort((a,b)=>utilisation(b)-utilisation(a)).map(c=>{
+      const p=utilisation(c);
+      const color=p>=80?"#e45b68":p>=50?"#ed9b40":"#635bdb";
+      return `<div class="bar-row">
+        <div class="bar-label"><span title="${safeText(c.name)}">${safeText(c.name)}</span><strong>${pct(p)}</strong></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,p)}%;background:${color}"></div></div>
+      </div>`;
+    }).join("");
+  }
+
+  const grid=$("cardsGrid");
+  if(!cards.length) {
+    grid.style.display="block";
+    grid.innerHTML=`<div class="empty"><div class="emoji">💳</div><h3>Your wallet starts here</h3><p>Add your first credit card to track limits and outstanding balances.</p><button class="btn primary" id="emptyAdd">＋ Add your first card</button></div>`;
+    $("emptyAdd").addEventListener("click",()=>openCardModal());
+    return;
+  }
+  grid.style.display="grid";
+  grid.innerHTML=cards.map((c,i)=>{
+    const p=utilisation(c);
+    const barColor=p>=80?"#e45b68":p>=50?"#ed9b40":"#635bdb";
+    const cardClass=c.color ? " "+c.color : "";
+    const bank=c.bank || "Credit card";
+    return `<article class="credit-card">
+      <div class="card-visual${cardClass}">
+        <div>
+          <div class="card-top"><span class="card-bank">${safeText(bank)}</span><span class="card-network">${safeText(c.network)}</span></div>
+          <div class="chip"></div>
+        </div>
+        <div class="card-bottom"><div><div class="card-name">${safeText(c.name)}</div><div class="card-tag">CREDIT CARD</div></div><span style="font-size:22px">◈</span></div>
+      </div>
+      <div class="card-body">
+        <div class="money-row">
+          <div><small>Outstanding</small><strong>${money(c.outstanding)}</strong></div>
+          <div style="text-align:right"><small>Credit limit</small><strong>${money(c.limit)}</strong></div>
+        </div>
+        <div class="util-label"><span>Credit utilisation</span><strong>${pct(p)}</strong></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,p)}%;background:${barColor}"></div></div>
+        <div class="due-note">${safeText(dueText(c))}</div>
+        <div class="card-actions">
+          <button class="btn" data-action="adjust" data-id="${safeText(c.id)}">± Balance</button>
+          <button class="btn" data-action="edit" data-id="${safeText(c.id)}">✎ Edit</button>
+          <button class="btn danger" data-action="delete" data-id="${safeText(c.id)}" aria-label="Delete ${safeText(c.name)}">×</button>
+        </div>
+      </div>
+    </article>`;
+  }).join("");
+}
+
+function openCardModal(id=null) {
+  editingId=id;
+  const c=id ? cards.find(x=>x.id===id) : null;
+  $("modalTitle").textContent=c?"Edit credit card":"Add credit card";
+  $("cardName").value=c?.name || "";
+  $("bankName").value=c?.bank || "";
+  $("network").value=c?.network || "Visa";
+  $("creditLimit").value=c?.limit ?? "";
+  $("outstanding").value=c?.outstanding ?? 0;
+  $("dueDate").value=c?.due || "";
+  $("cardColor").value=c?.color || "";
+  $("formError").style.display="none";
+  $("cardOverlay").classList.add("open");
+  document.body.style.overflow="hidden";
+  setTimeout(()=>$("cardName").focus(),50);
+}
+function closeCardModal() {
+  $("cardOverlay").classList.remove("open");
+  document.body.style.overflow="";
+}
+function openAdjust(id) {
+  const c=cards.find(x=>x.id===id);
+  if(!c)return;
+  adjustingId=id;
+  $("adjustCardLabel").textContent=c.name+" · Current outstanding: "+money(c.outstanding);
+  $("adjustAmount").value=c.outstanding;
+  $("adjustError").style.display="none";
+  $("adjustOverlay").classList.add("open");
+  document.body.style.overflow="hidden";
+  setTimeout(()=>$("adjustAmount").focus(),50);
+}
+function closeAdjust() {
+  $("adjustOverlay").classList.remove("open");
+  document.body.style.overflow="";
+}
+function validAmount(value,allowZero=true) {
+  const n=Number(value);
+  return Number.isFinite(n) && n >= (allowZero?0:0.01) && n <= 100000000000;
+}
+$("addBtn").addEventListener("click",()=>openCardModal());
+$("addBtn2").addEventListener("click",()=>openCardModal());
+$("closeModal").addEventListener("click",closeCardModal);
+$("cancelModal").addEventListener("click",closeCardModal);
+$("closeAdjust").addEventListener("click",closeAdjust);
+$("cancelAdjust").addEventListener("click",closeAdjust);
+
+$("cardOverlay").addEventListener("click",e=>{
+  if(e.target===$("cardOverlay"))closeCardModal();
+});
+$("adjustOverlay").addEventListener("click",e=>{
+  if(e.target===$("adjustOverlay"))closeAdjust();
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){closeCardModal();closeAdjust();}
+});
+
+$("cardForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const name=$("cardName").value.trim();
+  const limit=Number($("creditLimit").value);
+  const outstanding=Number($("outstanding").value);
+  const error=$("formError");
+  let message="";
+  if(!name)message="Please enter a card name.";
+  else if(!validAmount(limit,false))message="Enter a valid credit limit greater than zero.";
+  else if(!validAmount(outstanding))message="Enter a valid outstanding amount.";
+  else if(outstanding>limit)message="Outstanding exceeds the credit limit. Please check the amounts.";
+  if(message){error.textContent=message;error.style.display="block";return;}
+
+  const existing=editingId ? cards.find(c=>c.id===editingId) : null;
+  const card=normalizeCard({
+    id:existing?.id || uid(),
+    name,
+    bank:$("bankName").value.trim(),
+    network:$("network").value,
+    limit,
+    outstanding,
+    due:$("dueDate").value,
+    color:$("cardColor").value,
+    created:existing?.created || Date.now()
+  });
+  if(existing)cards=cards.map(c=>c.id===editingId?card:c);
+  else cards.push(card);
+  save();render();closeCardModal();
+  notify(existing?"Card updated.":"Card added.");
+});
+
+$("adjustForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const c=cards.find(x=>x.id===adjustingId);
+  const amount=Number($("adjustAmount").value);
+  if(!c)return;
+  if(!validAmount(amount)){
+    $("adjustError").textContent="Enter a valid amount.";
+    $("adjustError").style.display="block";return;
+  }
+  if(amount>c.limit){
+    $("adjustError").textContent="Outstanding cannot exceed the credit limit.";
+    $("adjustError").style.display="block";return;
+  }
+  c.outstanding=amount;
+  save();render();closeAdjust();notify("Outstanding updated.");
+});
+
+$("cardsGrid").addEventListener("click",e=>{
+  const button=e.target.closest("button[data-action]");
+  if(!button)return;
+  const id=button.dataset.id;
+  const c=cards.find(x=>x.id===id);
+  if(!c)return;
+  if(button.dataset.action==="edit")openCardModal(id);
+  if(button.dataset.action==="adjust")openAdjust(id);
+  if(button.dataset.action==="delete"){
+    if(confirm(`Delete "${c.name}" from Cardfolio? This cannot be undone unless you have a backup.`)){
+      cards=cards.filter(x=>x.id!==id);
+      save();render();notify("Card deleted.");
+    }
+  }
+});
+
+$("exportBtn").addEventListener("click",()=>{
+  const backup={app:"Cardfolio",version:1,exportedAt:new Date().toISOString(),cards};
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="cardfolio-backup-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  notify("Backup exported.");
+});
+
+$("importBtn").addEventListener("click",()=>$("importFile").click());
+$("importFile").addEventListener("change",async e=>{
+  const file=e.target.files?.[0];
+  if(!file)return;
+  try{
+    if(file.size>5*1024*1024)throw new Error("Backup file is too large.");
+    const data=JSON.parse(await file.text());
+    const imported=Array.isArray(data)?data:data.cards;
+    if(!Array.isArray(imported))throw new Error("This file is not a valid Cardfolio backup.");
+    if(imported.length>1000)throw new Error("Too many cards in this backup.");
+    if(!imported.every(validCard))throw new Error("One or more cards contain invalid data.");
+    const normalized=imported.map(normalizeCard);
+    if(!confirm(`Restore ${normalized.length} cards? This will replace your current ${cards.length} card(s). Export a backup first if needed.`))return;
+    cards=normalized;
+    save();render();notify("Backup restored.");
+  }catch(err){notify(err.message || "Unable to read backup.");}
+  finally{e.target.value="";}
+});
+
+load();
+render();
+})();
+</script>
+</body>
+</html>
